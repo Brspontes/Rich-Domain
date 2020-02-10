@@ -63,5 +63,53 @@ namespace NerdStore.Core.DomainObjects
             if (valor < minimo || valor > maximo)
                 throw new DomainException(mensagem);
         }
+
+        public static void ValidarMinimoMaximo(int valor, int minimo, int maximo, string mensagem)
+        {
+            if (valor < minimo || valor > maximo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarMinimoMaximo(long valor, long minimo, long maximo, string mensagem)
+        {
+            if (valor < minimo || valor > maximo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarMinimoMaximo(decimal valor, decimal minimo, decimal maximo, string mensagem)
+        {
+            if (valor < minimo || valor > maximo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarSeMenorIgualMinimo(long valor, long minimo, string mensagem)
+        {
+            if (valor <= minimo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarSeMenorIgualMinimo(double valor, double minimo, string mensagem)
+        {
+            if (valor <= minimo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarSeMenorIgualMinimo(decimal valor, decimal minimo, string mensagem)
+        {
+            if (valor <= minimo)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarSeFalso(bool boolValor, string mensagem)
+        {
+            if (boolValor)
+                throw new DomainException(mensagem);
+        }
+
+        public static void ValidarSeVerdadeiro(bool boolValor, string mensagem)
+        {
+            if (!boolValor)
+                throw new DomainException(mensagem);
+        }
     }
 }
