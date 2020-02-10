@@ -7,7 +7,7 @@ namespace NerdStore.Catalogo.Domain
 {
     public class Categoria : Entity
     {
-        public Categoria(string nome, string codigo)
+        public Categoria(string nome, int codigo)
         {
             Nome = nome;
             Codigo = codigo;
@@ -21,7 +21,12 @@ namespace NerdStore.Catalogo.Domain
         }
 
         public string Nome { get; private set; }
-        public string Codigo { get; private set; }
+        public int Codigo { get; private set; }
+
+        //EF Relation
+        public ICollection<Produto> Produtos { get; set; }
+
+        protected Categoria() { }
 
         public void Validar()
         {
