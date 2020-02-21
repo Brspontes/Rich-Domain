@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using NerdStore.Core.Messages;
+using NerdStore.Vendas.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,11 +12,45 @@ namespace NerdStore.Vendas.Application.Commands
 {
     public class PedidoCommandHandler : IRequestHandler<AdicionarItemPedidoCommand, bool>
     {
+        private readonly IPedidoRepository pedidoRepository;
+
+        public PedidoCommandHandler(IPedidoRepository pedidoRepository)
+        {
+            this.pedidoRepository = pedidoRepository;
+        }
+
         public async Task<bool> Handle(AdicionarItemPedidoCommand message, CancellationToken cancellationToken)
         {
             if (!ValidarComando(message)) return false;
 
-            return true;
+            var pedido = await pedidoRepository.ObterPedidoRascunhoPorClienteId(message.ClienteId);
+            var pedidoItem = new PedidoItem(message.ProdutoId, message.Nome, message.Quantidade, message.ValorUnitario);
+
+            if(pedido is null)
+            {
+                pedido = Pedido.PedidoFactory.NovoPedidoRascunho(message.ClienteId);
+                pedido.AdicionarItem(pedidoItem);
+
+                pedidoRepository.Adicionar(pedido);
+            }
+            else
+            {
+                var pedidoItemExistente = pedido.PedidoItemExistente(pedidoItem);
+                pedido.AdicionarItem(pedidoItem);
+
+                if (pedidoItemExistente)
+                {
+                    pedidoRepository.AtualizarItem(pedido.PedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId));
+                }
+                else
+                {
+                    pedidoRepository.AdicionarItem(pedidoItem);
+                }
+
+                //pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
+            }
+
+            return await pedidoRepository.UnitOfWork.Commit();
         }
 
         private bool ValidarComando(Command message)
