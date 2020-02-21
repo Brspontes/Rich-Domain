@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NerdStore.Catalogo.Application.Services;
 using NerdStore.Core.Bus;
+using NerdStore.Core.Messages.ComunMessages.Notifications;
 using NerdStore.Vendas.Application.Commands;
 
 namespace NerdStore.WebApp.MVC.Controllers
@@ -14,7 +16,8 @@ namespace NerdStore.WebApp.MVC.Controllers
         private readonly IProdutoAppService produtoAppService;
         private readonly IMediatrHandler mediatr;
 
-        public CarrinhoController(IProdutoAppService produtoAppService, IMediatrHandler mediatr)
+        public CarrinhoController(IProdutoAppService produtoAppService, IMediatrHandler mediatr,
+            INotificationHandler<DomainNotification> notificationHandler) : base (notificationHandler, mediatr)
         {
             this.produtoAppService = produtoAppService;
             this.mediatr = mediatr;
@@ -42,7 +45,12 @@ namespace NerdStore.WebApp.MVC.Controllers
 
             await mediatr.EnviarComando(command);
 
-            TempData["Error"] = "Produto Indisponivel";
+            if (OperacaoValida())
+            {
+                RedirectToAction("Index");
+            }
+
+            TempData["Erros"] = ObterMensagensErro();
             return RedirectToAction("ProdutoDetalhe", "Vitrine", new { id });
         }
     }
