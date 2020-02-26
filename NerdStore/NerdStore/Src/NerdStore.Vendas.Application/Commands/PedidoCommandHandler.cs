@@ -12,7 +12,12 @@ using System.Threading.Tasks;
 
 namespace NerdStore.Vendas.Application.Commands
 {
-    public class PedidoCommandHandler : IRequestHandler<AdicionarItemPedidoCommand, bool>
+    public class PedidoCommandHandler : 
+        IRequestHandler<AdicionarItemPedidoCommand, bool>,
+        IRequestHandler<RemoverItemPedidoCommand, bool>,
+        IRequestHandler<AtualizarItemPedidoCommand, bool>,
+        IRequestHandler<AplicarVoucherPedidoCommand, bool>
+
     {
         private readonly IPedidoRepository pedidoRepository;
         private readonly IMediatrHandler mediatrHandler;
@@ -55,6 +60,21 @@ namespace NerdStore.Vendas.Application.Commands
             }
 
             return await pedidoRepository.UnitOfWork.Commit();
+        }
+
+        public Task<bool> Handle(AtualizarItemPedidoCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Handle(AplicarVoucherPedidoCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IRequestHandler<RemoverItemPedidoCommand, bool>.Handle(RemoverItemPedidoCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         private bool ValidarComando(Command message)

@@ -9,6 +9,7 @@ using NerdStore.Core.Bus;
 using NerdStore.Core.Messages.ComunMessages.DomainEvents;
 using NerdStore.Core.Messages.ComunMessages.Notifications;
 using NerdStore.Vendas.Application.Commands;
+using NerdStore.Vendas.Application.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace NerdStore.WebApp.MVC.Setup
 
             // Catalogo
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
+            services.AddScoped<IPedidoQueries, PedidoQueries>();
             services.AddScoped<IProdutoAppService, ProdutoAppService>();
             services.AddScoped<IEstoqueService, EstoqueService>();
             services.AddScoped<CatalogoContext>();
