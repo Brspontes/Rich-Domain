@@ -18,6 +18,13 @@ namespace NerdStore.Core.DomainObjects
             Id = Guid.NewGuid();
         }
 
+        public void AdicionarEvento(Event evento)
+        {
+            _notificacoes = _notificacoes ?? new List<Event>();
+            _notificacoes.Add(evento);
+        }
+
+
         public override bool Equals(object obj)
         {
             var compareTo = obj as Entity;

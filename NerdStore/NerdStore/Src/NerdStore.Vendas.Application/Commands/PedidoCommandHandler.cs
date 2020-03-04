@@ -56,23 +56,47 @@ namespace NerdStore.Vendas.Application.Commands
                     pedidoRepository.AdicionarItem(pedidoItem);
                 }
 
-                //pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
+                pedido.AdicionarEvento(new PedidoitemAdicionadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
             }
 
             return await pedidoRepository.UnitOfWork.Commit();
         }
 
-        public Task<bool> Handle(AtualizarItemPedidoCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AtualizarItemPedidoCommand message, CancellationToken cancellationToken)
+        {
+            if (!ValidarComando(message)) return false;
+
+            var pedido = await pedidoRepository.ObterPedidoRascunhoPorClienteId(message.ClienteId);
+
+            if (pedido == null)
+            {
+                await mediatrHandler.PublicarNotificacao(new DomainNotification("pedido", "Pedido não encontrado!"));
+                return false;
+            }
+
+            var pedidoItem = await pedidoRepository.ObterItemPorPedido(pedido.Id, message.ProdutoId);
+
+            if (!pedido.PedidoItemExistente(pedidoItem))
+            {
+                await mediatrHandler.PublicarNotificacao(new DomainNotification("pedido", "Item do pedido não encontrado!"));
+                return false;
+            }
+
+            pedido.AtualizarUnidades(pedidoItem, message.Quantidade);
+            //pedido.AdicionarEvento(new PedidoProdutoAtualizadoEvent(message.ClienteId, pedido.Id, message.ProdutoId, message.Quantidade));
+
+            pedidoRepository.AtualizarItem(pedidoItem);
+            pedidoRepository.Atualizar(pedido);
+
+            return await pedidoRepository.UnitOfWork.Commit();
+        }
+
+        public async Task<bool> Handle(AplicarVoucherPedidoCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> Handle(AplicarVoucherPedidoCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<bool> IRequestHandler<RemoverItemPedidoCommand, bool>.Handle(RemoverItemPedidoCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(RemoverItemPedidoCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
